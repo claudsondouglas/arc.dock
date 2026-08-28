@@ -5,7 +5,7 @@
   "version": "0.1.0",
   "author": "rosakodu",
   "license": "MIT",
-  "description": "Dock flutuante para o Omarchy. Por enquanto: uma superfície 200x52 ancorada no centro inferior da tela, por cima das janelas.",
+  "description": "Dock flutuante para o Omarchy. Um slot por app aberto, ancorado no centro inferior da tela, por cima das janelas.",
   "kinds": [
     "service"
   ],
