@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "id": "rosakodu.arcdock",
-  "name": "Arcdock",
+  "id": "arc.dock",
+  "name": "Arc Dock",
   "version": "0.1.0",
   "author": "rosakodu",
   "license": "MIT",

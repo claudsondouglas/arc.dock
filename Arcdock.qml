@@ -23,7 +23,7 @@ Item {
     id: dockWindow
     color: "transparent"
 
-    WlrLayershell.namespace: "omarchy-arcdock"
+    WlrLayershell.namespace: "arc-dock"
     // Top fica acima das janelas normais mas abaixo de overlays (OSD, lock).
     WlrLayershell.layer: WlrLayer.Top
     WlrLayershell.keyboardFocus: WlrKeyboardFocus.None

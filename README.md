@@ -1,4 +1,4 @@
-# Arcdock
+# Arc Dock
 
 Dock para o [Omarchy](https://omarchy.org/) shell (Quickshell).
 
@@ -10,7 +10,7 @@ espaço), com fundo e borda herdados do tema ativo.
 
 ```bash
 omarchy-shell shell rescanPlugins
-omarchy plugin enable rosakodu.arcdock
+omarchy plugin enable arc.dock
 omarchy restart shell
 ```
 
@@ -22,7 +22,7 @@ do Omarchy recarrega o código mas não reaplica a geometria da `PanelWindow`.
 Para conferir que a versão nova está no ar:
 
 ```bash
-hyprctl layers | grep -A3 omarchy-arcdock
+hyprctl layers | grep -A3 arc-dock
 ```
 
 ## Licença
