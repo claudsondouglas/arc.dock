@@ -19,6 +19,9 @@ Item {
   readonly property int dockWidth: 200
   readonly property int dockHeight: 52
 
+  // Folga entre a base do dock e a borda de baixo da tela.
+  readonly property int bottomMargin: 14
+
   PanelWindow {
     id: dockWindow
     color: "transparent"
@@ -31,7 +34,7 @@ Item {
     // Ancorado só na borda de baixo: o layer-shell centraliza a superfície
     // horizontalmente nessa borda, então não é preciso calcular o x.
     anchors.bottom: true
-    margins.bottom: Style.gapsOut
+    margins.bottom: root.bottomMargin
 
     // Flutua por cima: não reserva espaço nem empurra as janelas.
     exclusionMode: ExclusionMode.Ignore
