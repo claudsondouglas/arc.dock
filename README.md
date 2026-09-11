@@ -4,9 +4,7 @@ A dock for the [Omarchy](https://omarchy.org/) shell (Quickshell) that looks
 like the macOS dock: frosted glass, magnification under the pointer, one slot
 per app.
 
-![Arc Dock](docs/dock.png)
-
-![Magnification under the pointer](docs/magnify.png)
+![Arc Dock](preview.png)
 
 ## Requirements
 
@@ -27,7 +25,9 @@ Right-click the dock to open its settings.
 
 ## What it is
 
-![The dock on the desktop, with the settings window open](docs/desktop.png)
+![The dock at rest](docs/dock.png)
+
+![Magnification under the pointer](docs/magnify.png)
 
 Pinnable, reorderable slots, recent apps, auto-hide and a settings window. The
 dock is a surface anchored to one screen edge on the `Top` layer (above
