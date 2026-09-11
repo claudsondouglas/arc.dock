@@ -291,7 +291,7 @@ Item {
       // Ficar com os padrões é melhor que ficar sem dock. E o arquivo não é
       // reescrito daqui: sobrescrever um JSON que o usuário estragou editando
       // levaria junto o resto do que ele tinha ajustado.
-      console.warn("arc.dock: ajustes ilegíveis em", config.path, "-", error)
+      console.warn("arcdock: ajustes ilegíveis em", config.path, "-", error)
       return
     }
 
@@ -326,7 +326,7 @@ Item {
     // quer mesmo dizer "nada ajustado", e gravar já é seguro.
     onLoadFailed: config.loaded = true
     onSaveFailed: function (error) {
-      console.warn("arc.dock: não deu para gravar os ajustes em", config.path, "-", error)
+      console.warn("arcdock: não deu para gravar os ajustes em", config.path, "-", error)
     }
   }
 

@@ -36,7 +36,7 @@ Item {
   // Vem do manifesto injetado, e não escrito aqui: `omarchy plugin clone` gera
   // uma cópia com id de outro nome, e um id fixo abriria os ajustes do original.
   property var manifest: null
-  readonly property string pluginId: (manifest && manifest.id) ? String(manifest.id) : "arc.dock"
+  readonly property string pluginId: (manifest && manifest.id) ? String(manifest.id) : "io.github.claudsondouglas.arcdock"
 
   // Os ajustes do usuário. Existe um só, e é nele que a janela de ajustes
   // escreve: o dock lê por binding, então mexer num controle repinta na hora.
@@ -1733,7 +1733,7 @@ Item {
         return
       }
       attemptsLeft--
-      if (attemptsLeft === 0) console.warn("arc.dock: serviço de notificações não encontrado; o contador fica desligado")
+      if (attemptsLeft === 0) console.warn("arcdock: serviço de notificações não encontrado; o contador fica desligado")
     }
   }
 
@@ -2002,7 +2002,7 @@ Item {
     try {
       data = JSON.parse(text)
     } catch (error) {
-      console.warn("arc.dock: estado ilegível em", root.statePath, "-", error)
+      console.warn("arcdock: estado ilegível em", root.statePath, "-", error)
       return
     }
 
@@ -2051,7 +2051,7 @@ Item {
     // A gravação é outra história: falhando ela, o fixado que está na tela some
     // no próximo início, e o usuário não teria como saber por quê.
     onSaveFailed: function (error) {
-      console.warn("arc.dock: não deu para gravar o estado em", root.statePath, "-", error)
+      console.warn("arcdock: não deu para gravar o estado em", root.statePath, "-", error)
     }
   }
 

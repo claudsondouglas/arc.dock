@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "id": "arc.dock",
+  "id": "io.github.claudsondouglas.arcdock",
   "name": "Arc Dock",
   "version": "0.2.0",
   "author": "Claudson",

@@ -53,7 +53,7 @@ Item {
   // chega ao `config`.
   property var service: null
 
-  readonly property string pluginId: (manifest && manifest.id) ? String(manifest.id) : "arc.dock"
+  readonly property string pluginId: (manifest && manifest.id) ? String(manifest.id) : "io.github.claudsondouglas.arcdock"
 
   // O host injeta `service` ao montar a superfície, mas serviço e painel são
   // montados por caminhos diferentes e nada garante qual chega primeiro. Se a

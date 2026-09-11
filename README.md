@@ -20,10 +20,10 @@ still works, the shell just stays translucent instead of frosted.
 ### Enable, disable, update, remove
 
 ```bash
-omarchy plugin enable arc.dock     # turn it on
-omarchy plugin disable arc.dock    # turn it off, keep the files
-omarchy plugin update arc.dock     # pull the latest version
-omarchy plugin remove arc.dock     # delete the plugin
+omarchy plugin enable io.github.claudsondouglas.arcdock     # turn it on
+omarchy plugin disable io.github.claudsondouglas.arcdock    # turn it off, keep the files
+omarchy plugin update io.github.claudsondouglas.arcdock     # pull the latest version
+omarchy plugin remove io.github.claudsondouglas.arcdock     # delete the plugin
 ```
 
 Disabling keeps your settings and pinned apps. Removing deletes the plugin
@@ -152,12 +152,12 @@ default value. Pinned apps and recents are stored separately, in
 To bind the settings window to a Hyprland shortcut:
 
 ```bash
-omarchy-shell shell toggle arc.dock '{}'
+omarchy-shell shell toggle io.github.claudsondouglas.arcdock '{}'
 ```
 
 ## Development
 
-The plugin lives in `~/.config/omarchy/plugins/arc.dock`. After editing any
+The plugin lives in `~/.config/omarchy/plugins/io.github.claudsondouglas.arcdock`. After editing any
 `.qml`, run `omarchy restart shell`: hot reload picks up the code but not the
 `PanelWindow` geometry. `hyprctl layers | grep arc-dock` shows the dock window
 and its size. The code comments explain the design decisions.
