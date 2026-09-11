@@ -2,15 +2,16 @@
   "schemaVersion": 1,
   "id": "arc.dock",
   "name": "Arc Dock",
-  "version": "0.1.0",
-  "author": "rosakodu",
+  "version": "0.2.0",
+  "author": "Claudson",
   "license": "MIT",
-  "description": "Dock flutuante para o Omarchy. Um slot por app aberto, ancorado no centro inferior da tela, por cima das janelas.",
+  "description": "Dock flutuante para o Omarchy. Um slot por app aberto, ancorado numa borda da tela, por cima das janelas.",
   "kinds": [
-    "service"
+    "service",
+    "panel"
   ],
-  "keepLoaded": true,
   "entryPoints": {
-    "service": "Arcdock.qml"
+    "service": "Arcdock.qml",
+    "panel": "ArcSettings.qml"
   }
 }
