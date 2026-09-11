@@ -164,7 +164,7 @@ omarchy-shell shell toggle io.github.claudsondouglas.arcdock '{}'
 Two things are planned:
 
 - Keyboard control: a shortcut to bring the dock into focus, then arrows to
-  move between icons and Enter to open.
+  move between icons, Enter to open and W to close.
 - Folders in the dock: pin a directory as a slot, so a click opens it in the
   file manager.
 
