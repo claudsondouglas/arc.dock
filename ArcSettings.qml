@@ -109,88 +109,88 @@ Item {
     {
       id: "size",
       icon: "󰩨",
-      title: "Tamanho",
-      blurb: "O tamanho dos ícones e as folgas que separam o dock do resto.",
+      title: "Size",
+      blurb: "Icon size and the gaps that separate the dock from everything else.",
       items: [
-        { key: "iconSize", type: "int", label: "Tamanho do ícone", suffix: " px",
-          description: "O lado do ícone em repouso, antes de qualquer ampliação." },
-        { key: "slotGap", type: "int", label: "Espaço entre slots", suffix: " px",
-          description: "Folga entre um ícone e o vizinho." },
-        { key: "dockPadding", type: "int", label: "Folga interna", suffix: " px",
-          description: "Espaço entre a fileira e a borda da casca." },
-        { key: "edgeMargin", type: "int", label: "Distância até a borda", suffix: " px",
-          description: "Quanto o dock fica afastado da borda da tela." }
+        { key: "iconSize", type: "int", label: "Icon size", suffix: " px",
+          description: "The icon's side at rest, before any magnification." },
+        { key: "slotGap", type: "int", label: "Gap between slots", suffix: " px",
+          description: "Space between an icon and its neighbor." },
+        { key: "dockPadding", type: "int", label: "Inner padding", suffix: " px",
+          description: "Space between the row and the edge of the shell." },
+        { key: "edgeMargin", type: "int", label: "Distance to the edge", suffix: " px",
+          description: "How far the dock sits from the screen edge." }
       ]
     },
     {
       id: "magnify",
       icon: "󰍉",
-      title: "Ampliação",
-      blurb: "A onda que levanta o ícone embaixo do ponteiro.",
+      title: "Magnification",
+      blurb: "The wave that lifts the icon under the pointer.",
       items: [
-        { key: "magnify", type: "bool", label: "Onda sob o ponteiro",
-          description: "O ícone embaixo do cursor cresce e sobe acima da casca, os vizinhos crescem menos, e o dock se abre para caber." },
-        { key: "magnifyScale", type: "int", label: "Tamanho no pico", suffix: " %", needs: "magnify",
-          description: "Quanto o ícone do pico cresce em relação ao tamanho de repouso." },
-        { key: "magnifyReach", type: "int", label: "Alcance da onda", suffix: " slots", suffixOne: " slot", needs: "magnify",
-          description: "Quantos vizinhos de cada lado sobem junto com o ícone do pico." }
+        { key: "magnify", type: "bool", label: "Wave under the pointer",
+          description: "The icon under the cursor grows and rises above the shell, neighbors grow less, and the dock opens up to fit." },
+        { key: "magnifyScale", type: "int", label: "Size at the peak", suffix: " %", needs: "magnify",
+          description: "How much the peak icon grows relative to its resting size." },
+        { key: "magnifyReach", type: "int", label: "Reach", suffix: " slots", suffixOne: " slot", needs: "magnify",
+          description: "How many neighbors on each side rise along with the peak icon." }
       ]
     },
     {
       id: "background",
       icon: "󰉓",
-      title: "Fundo",
-      blurb: "De que cor é a casca, e quanto do desktop atravessa ela.",
+      title: "Background",
+      blurb: "What color the shell is, and how much of the desktop shows through.",
       items: [
-        { key: "dockTheme", type: "enum", label: "Tom da casca" },
-        { key: "glass", type: "bool", label: "Vidro fosco",
-          description: "A casca fica translúcida e o Hyprland desfoca o que passa por trás dela." },
-        { key: "glassOpacity", type: "int", label: "Opacidade da casca", suffix: " %", needs: "glass",
-          description: "Quanto da casca é cor, e quanto é o desktop atravessando." }
+        { key: "dockTheme", type: "enum", label: "Shell tone" },
+        { key: "glass", type: "bool", label: "Frosted glass",
+          description: "The shell turns translucent and Hyprland blurs what passes behind it." },
+        { key: "glassOpacity", type: "int", label: "Shell opacity", suffix: " %", needs: "glass",
+          description: "How much of the shell is color, and how much is the desktop showing through." }
       ]
     },
     {
       id: "content",
       icon: "󰀻",
-      title: "Conteúdo",
-      blurb: "O que a fileira mostra além dos apps que estão abertos.",
+      title: "Content",
+      blurb: "What the row shows besides the apps that are open.",
       items: [
-        { key: "showLauncher", type: "bool", label: "Botão de apps",
-          description: "O botão que abre o menu de apps, na ponta da fileira." },
-        { key: "showSeparator", type: "bool", label: "Filete separador",
-          description: "Divide os grupos da fileira: os apps com slot, os recentes e o botão de apps." },
-        { key: "showIndicators", type: "bool", label: "Pontos de estado",
-          description: "A marca embaixo do ícone que diz que o app está aberto. Sem ela, um app fixado e fechado fica igual a um aberto." },
-        { key: "indicatorStyle", type: "enum", label: "Marca de app aberto", needs: "showIndicators" },
-        { key: "showBadges", type: "bool", label: "Contador de notificações",
-          description: "O número vermelho no canto do ícone, como no macOS: quantas notificações do app chegaram desde a última vez que ele esteve em foco." },
-        { key: "recentCount", type: "int", label: "Apps recentes",
-          description: "Apps que você abriu e fechou continuam à mão, entre os que têm slot e o botão. Zero desliga o grupo." }
+        { key: "showLauncher", type: "bool", label: "App button",
+          description: "The button that opens the app menu, at the end of the row." },
+        { key: "showSeparator", type: "bool", label: "Separator",
+          description: "Divides the groups in the row: apps with a slot, recents and the app button." },
+        { key: "showIndicators", type: "bool", label: "State dots",
+          description: "The mark under the icon that says the app is open. Without it, a pinned closed app looks the same as an open one." },
+        { key: "indicatorStyle", type: "enum", label: "Open app mark", needs: "showIndicators" },
+        { key: "showBadges", type: "bool", label: "Notification counter",
+          description: "The red number on the corner of the icon, as on macOS: how many notifications arrived since the app was last focused." },
+        { key: "recentCount", type: "int", label: "Recent apps",
+          description: "Apps you opened and closed stay within reach, between the ones with a slot and the button. Zero turns the group off." }
       ]
     },
     {
       id: "position",
       icon: "󰍹",
-      title: "Posição",
-      blurb: "Em que borda e em que tela o dock mora.",
+      title: "Position",
+      blurb: "Which edge and which screen the dock lives on.",
       items: [
-        { key: "edge", type: "enum", label: "Borda da tela",
-          description: "De que lado da tela o dock ancora." },
+        { key: "edge", type: "enum", label: "Screen edge",
+          description: "Which side of the screen the dock anchors to." },
         { key: "screenName", type: "enum", widget: "dropdown", label: "Monitor",
-          description: "Em qual saída o dock aparece. Automática segue a maior." }
+          description: "Which output the dock shows on. Automatic follows the largest." }
       ]
     },
     {
       id: "hide",
       icon: "󰈉",
-      title: "Esconder",
-      blurb: "Quando o dock sai de cena, e com que pressa.",
+      title: "Hide",
+      blurb: "When the dock gets out of the way, and how fast.",
       items: [
-        { key: "autoHide", type: "enum", label: "Quando sair de cena" },
-        { key: "hideDelay", type: "int", label: "Carência para recolher", suffix: " ms", step: 50,
-          description: "Quanto o dock espera com o ponteiro longe antes de recolher." },
-        { key: "slideDuration", type: "int", label: "Duração do deslize", suffix: " ms", step: 20,
-          description: "O tempo que o dock leva para sair e para voltar." }
+        { key: "autoHide", type: "enum", label: "When to hide" },
+        { key: "hideDelay", type: "int", label: "Grace before hiding", suffix: " ms", step: 50,
+          description: "How long the dock waits with the pointer away before hiding." },
+        { key: "slideDuration", type: "int", label: "Slide duration", suffix: " ms", step: 20,
+          description: "How long the dock takes to leave and to come back." }
       ]
     }
   ]
@@ -210,36 +210,36 @@ Item {
   // uma linha só, e a explicação de cada um é o texto que muda embaixo do nome
   // da linha conforme a escolha (ver `descriptionFor`).
   readonly property var dockThemeOptions: [
-    { value: "theme", label: "Do tema" },
-    { value: "light", label: "Claro" },
-    { value: "dark", label: "Escuro" }
+    { value: "theme", label: "Theme" },
+    { value: "light", label: "Light" },
+    { value: "dark", label: "Dark" }
   ]
 
   readonly property var indicatorStyleOptions: [
-    { value: "dot", label: "Um ponto" },
-    { value: "dots", label: "Por janela" },
-    { value: "bar", label: "Traço" }
+    { value: "dot", label: "One dot" },
+    { value: "dots", label: "Per window" },
+    { value: "bar", label: "Bar" }
   ]
 
   readonly property var edgeOptions: [
-    { value: "bottom", label: "Abaixo" },
-    { value: "top", label: "Acima" },
-    { value: "left", label: "Esquerda" },
-    { value: "right", label: "Direita" }
+    { value: "bottom", label: "Bottom" },
+    { value: "top", label: "Top" },
+    { value: "left", label: "Left" },
+    { value: "right", label: "Right" }
   ]
 
   readonly property var autoHideOptions: [
-    { value: "never", label: "Nunca" },
-    { value: "fullscreen", label: "Tela cheia" },
-    { value: "covered", label: "Coberto" },
-    { value: "always", label: "Sempre" }
+    { value: "never", label: "Never" },
+    { value: "fullscreen", label: "Fullscreen" },
+    { value: "covered", label: "Covered" },
+    { value: "always", label: "Always" }
   ]
 
   // As saídas ligadas, mais a opção automática. O nome é a identidade que o
   // dock guarda: é ele que ainda casa com a mesma tela depois de um reinício,
   // ao contrário da ordem em que o compositor as devolve.
   readonly property var screenOptions: {
-    var options = [{ value: "", label: "Automática (a maior)" }]
+    var options = [{ value: "", label: "Automatic (largest)" }]
     var screens = Quickshell.screens || []
     for (var i = 0; i < screens.length; i++) {
       var candidate = screens[i]
@@ -271,20 +271,20 @@ Item {
     if (!root.config) return String(spec.description || "")
 
     if (spec.key === "dockTheme") {
-      if (root.config.dockTheme === "light") return "Vidro claro, independente do tema do desktop."
-      if (root.config.dockTheme === "dark") return "Vidro escuro, independente do tema do desktop — o dock fica escuro mesmo num tema claro."
-      return "A casca sai do tom de popup do tema ativo, e troca junto com ele."
+      if (root.config.dockTheme === "light") return "Light glass, regardless of the desktop theme."
+      if (root.config.dockTheme === "dark") return "Dark glass, regardless of the desktop theme: the dock stays dark even on a light theme."
+      return "The shell takes the active theme's popup tone and changes with it."
     }
     if (spec.key === "indicatorStyle") {
-      if (root.config.indicatorStyle === "dots") return "Cada janela aberta ganha um ponto, até dois."
-      if (root.config.indicatorStyle === "bar") return "Um traço sob o ícone, mais visível que o ponto sobre ícones claros."
-      return "Um ponto só, tenha o app uma janela ou várias."
+      if (root.config.indicatorStyle === "dots") return "Each open window gets a dot, up to two."
+      if (root.config.indicatorStyle === "bar") return "A bar under the icon, easier to see than a dot on light icons."
+      return "A single dot, whether the app has one window or several."
     }
     if (spec.key === "autoHide") {
-      if (root.config.autoHide === "never") return "O dock fica plantado, mesmo por cima de um app em tela cheia."
-      if (root.config.autoHide === "always") return "O dock só aparece quando o ponteiro encosta na borda."
-      if (root.config.autoHide === "covered") return "Sai de cena assim que qualquer janela alcança a área dele — inclusive dois apps lado a lado, sem nenhum em tela cheia."
-      return "Sai de cena quando um app ocupa a tela sozinho, e volta ao encostar na borda."
+      if (root.config.autoHide === "never") return "The dock stays put, even over a fullscreen app."
+      if (root.config.autoHide === "always") return "The dock only shows when the pointer touches the edge."
+      if (root.config.autoHide === "covered") return "Hides as soon as any window reaches its area, including two apps side by side with neither in fullscreen."
+      return "Hides when one app takes the whole screen, and comes back when the pointer touches the edge."
     }
     return String(spec.description || "")
   }
@@ -297,8 +297,8 @@ Item {
     if (spec.key !== "glass") return ""
     if (!root.config || !root.config.glass) return ""
     if (!root.service || root.service.compositorBlur) return ""
-    return "O blur do Hyprland está desligado, então a casca fica translúcida sem ficar fosca. "
-      + "Ligue decoration:blur em ~/.config/hypr/looknfeel.lua."
+    return "Hyprland blur is off, so the shell is translucent without being frosted. "
+      + "Enable decoration:blur in ~/.config/hypr/looknfeel.lua."
   }
 
   // ---------------------------------------------------------------- valores
@@ -590,7 +590,7 @@ Item {
         PanelActionButton {
           id: undoButton
           iconText: "󰕌"
-          tooltipText: "Voltar ao padrão"
+          tooltipText: "Reset to default"
           foreground: Color.popups.text
           opacity: row.modified ? 1 : 0
           enabled: row.modified
@@ -795,7 +795,7 @@ Item {
             }
 
             Text {
-              text: root.config ? root.displayPath : "O dock não está no ar — não há o que ajustar."
+              text: root.config ? root.displayPath : "The dock is not running, so there is nothing to adjust."
               color: Color.muted
               font.family: Style.fontFamily
               font.pixelSize: Style.font.caption
@@ -816,8 +816,8 @@ Item {
               text: {
                 if (!root.config) return ""
                 var count = root.config.overrideCount
-                if (count === 0) return "Seguindo o tema"
-                return count + (count === 1 ? " ajuste" : " ajustes")
+                if (count === 0) return "Defaults"
+                return count + (count === 1 ? " change" : " changes")
               }
               color: (root.config && root.config.overrideCount > 0) ? Color.accent : Color.muted
               font.family: Style.fontFamily
@@ -826,7 +826,7 @@ Item {
             }
 
             Button {
-              text: "Restaurar tudo"
+              text: "Reset all"
               // Sem nada fora do padrão não há o que restaurar, e um botão que
               // não faz nada só faz duvidar se o clique valeu.
               enabled: !!root.config && root.config.customized
@@ -842,7 +842,7 @@ Item {
 
             PanelActionButton {
               iconText: "󰅖"
-              tooltipText: "Fechar  ·  Esc"
+              tooltipText: "Close  ·  Esc"
               foreground: Color.popups.text
               anchors.verticalCenter: parent.verticalCenter
               onClicked: root.close()
@@ -925,7 +925,7 @@ Item {
                 anchors.right: parent.right
                 anchors.verticalCenter: parent.verticalCenter
                 iconText: "󰕌"
-                tooltipText: "Restaurar esta seção"
+                tooltipText: "Reset this section"
                 foreground: Color.popups.text
                 visible: root.sectionModified(root.section)
                 onClicked: root.resetSection()
@@ -984,7 +984,7 @@ Item {
             width: parent.width
             horizontalAlignment: Text.AlignHCenter
             wrapMode: Text.WordWrap
-            text: "O dock não está no ar. Suba a shell e abra os ajustes de novo."
+            text: "The dock is not running. Start the shell and open the settings again."
             color: Color.muted
             font.family: Style.fontFamily
             font.pixelSize: Style.font.bodySmall
@@ -1003,8 +1003,8 @@ Item {
             anchors.left: parent.left
             anchors.right: parent.right
             anchors.verticalCenter: parent.verticalCenter
-            text: "↑↓ kj linha · ←→ hl ajusta · Tab seção · Backspace padrão · Esc fecha"
-              + "   —   os ajustes valem na hora"
+            text: "↑↓ kj row · ←→ hl adjust · Tab section · Backspace default · Esc close"
+              + "   —   changes apply immediately"
             color: Color.muted
             font.family: Style.fontFamily
             font.pixelSize: Style.font.caption

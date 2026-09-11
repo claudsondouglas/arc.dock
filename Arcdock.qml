@@ -1548,11 +1548,11 @@ Item {
       // fixado fechado não há "outra vez": a linha é só abrir.
       //
       // Comparar o rótulo resolve pouco: o nome da ação vem no idioma da
-      // sessão ("New Window" numa sessão en_US) e o genérico está escrito aqui
-      // em português, então dois textos diferentes passavam pelo teste e o menu
-      // saía com "Nova janela" e "New Window" um em cima do outro. O que casa
+      // sessão ("Nova janela" numa sessão pt_BR) e o genérico está escrito aqui
+      // em inglês, então dois textos diferentes passavam pelo teste e o menu
+      // saía com "New window" e "Nova janela" um em cima do outro. O que casa
       // em qualquer idioma é o *id* da ação, que o .desktop não traduz.
-      var generic = windows.length > 0 ? "Nova janela" : "Abrir"
+      var generic = windows.length > 0 ? "New window" : "Open"
       var duplicated = false
       for (var a = 0; a < actions.length; a++) {
         if (actions[a].label.toLowerCase() === generic.toLowerCase()) duplicated = true
@@ -1589,7 +1589,7 @@ Item {
     if (desktop) {
       items.push({ separator: true })
       items.push({
-        label: entry.pinned ? "Desafixar da dock" : "Fixar na dock",
+        label: entry.pinned ? "Unpin from dock" : "Pin to dock",
         run: pinToggler(entry)
       })
     }
@@ -1599,13 +1599,13 @@ Item {
     // saída. No mesmo grupo do fixar, que é a outra pergunta sobre quem ocupa a
     // fileira. Fixado e aberto não têm o item: o slot deles não vem daqui.
     if (!entry.pinned && windows.length === 0 && root.recentIndex(entry.key) >= 0) {
-      items.push({ label: "Remover dos recentes", run: recentRemover(entry) })
+      items.push({ label: "Remove from recents", run: recentRemover(entry) })
     }
 
     if (windows.length > 0) {
       items.push({ separator: true })
       items.push({
-        label: windows.length > 1 ? "Fechar tudo (" + windows.length + ")" : "Fechar",
+        label: windows.length > 1 ? "Close all (" + windows.length + ")" : "Close",
         run: closer(windows)
       })
     }
@@ -1733,7 +1733,7 @@ Item {
         return
       }
       attemptsLeft--
-      if (attemptsLeft === 0) console.warn("arcdock: serviço de notificações não encontrado; o contador fica desligado")
+      if (attemptsLeft === 0) console.warn("arcdock: notification service not found; the counter stays off")
     }
   }
 
@@ -2002,7 +2002,7 @@ Item {
     try {
       data = JSON.parse(text)
     } catch (error) {
-      console.warn("arcdock: estado ilegível em", root.statePath, "-", error)
+      console.warn("arcdock: could not read state from", root.statePath, "-", error)
       return
     }
 
@@ -2051,7 +2051,7 @@ Item {
     // A gravação é outra história: falhando ela, o fixado que está na tela some
     // no próximo início, e o usuário não teria como saber por quê.
     onSaveFailed: function (error) {
-      console.warn("arcdock: não deu para gravar o estado em", root.statePath, "-", error)
+      console.warn("arcdock: could not write state to", root.statePath, "-", error)
     }
   }
 
