@@ -159,6 +159,15 @@ To bind the settings window to a Hyprland shortcut:
 omarchy-shell shell toggle io.github.claudsondouglas.arcdock '{}'
 ```
 
+## Next steps
+
+Two things are planned:
+
+- Keyboard control: a shortcut to bring the dock into focus, then arrows to
+  move between icons and Enter to open.
+- Folders in the dock: pin a directory as a slot, so a click opens it in the
+  file manager.
+
 ## Development
 
 The plugin lives in `~/.config/omarchy/plugins/io.github.claudsondouglas.arcdock`. After editing any
