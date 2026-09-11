@@ -5,6 +5,10 @@ dock: frosted glass, magnification under the pointer, one slot per app.
 
 ![Arc Dock](preview.png)
 
+The icons in the screenshots come from the
+[MacTahoe icon theme](https://github.com/vinceliuice/MacTahoe-icon-theme).
+The dock uses whatever icon theme the shell is set to.
+
 ## Install
 
 ```bash
