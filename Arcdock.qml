@@ -484,60 +484,66 @@ Item {
   // casca chegue a ter, então a casca sempre entra.
   readonly property real glassIgnoreAlpha: config.limits.glassOpacity[0] / 100 / 2
 
-  // O comando que põe o compositor no estado do ajuste. Vazio quer dizer "não
-  // há nada a pedir" (ver o caminho legado abaixo).
+  // O pedido que põe o compositor no estado do ajuste, no protocolo do socket
+  // do Hyprland (ver ArcHyprland). Vazio quer dizer "não há nada a pedir"
+  // (ver o caminho legado abaixo).
   //
   // Sem `blur_popups`: o menu de contexto é uma popup desta mesma janela, mas
   // é opaco de propósito (ver `surfaceColor` no ArcMenu), e desfocar o que
   // passa atrás de uma superfície sólida é trabalho que não aparece.
-  readonly property var glassCommand: {
+  readonly property string glassCommand: {
     // Ancorado nas duas pontas: o compositor casa a expressão inteira, então
     // sem elas a regra pegaria também a janela de ajustes (`arc-dock-settings`)
     // — que é um cartão de texto, e o texto não se lê sobre um borrão.
     var namespace = "^(" + root.layerNamespace + ")$"
     if (Hyprland.usingLua) {
-      return ["hyprctl", "eval",
-        'hl.layer_rule({ name = "' + root.glassRuleName + '"'
-          + ', match = { namespace = "' + namespace + '" }'
-          + ', blur = true'
-          + ', ignore_alpha = ' + root.glassIgnoreAlpha
-          + ', enabled = ' + (config.glass ? "true" : "false") + ' })']
+      return 'eval hl.layer_rule({ name = "' + root.glassRuleName + '"'
+        + ', match = { namespace = "' + namespace + '" }'
+        + ', blur = true'
+        + ', ignore_alpha = ' + root.glassIgnoreAlpha
+        + ', enabled = ' + (config.glass ? "true" : "false") + ' })'
     }
     // Config legada (`.conf`): as regras não têm nome, então não há como
     // desfazer uma — só um `hyprctl reload`, que é caro demais para um
     // interruptor. Não precisa: o blur só se vê através de uma casca
     // translúcida, e desligar o vidro devolve a casca ao tom cheio do tema.
     // A regra que sobra deixa de ter o que desfocar.
-    if (!config.glass) return []
-    return ["hyprctl", "--batch",
-      "keyword layerrule blur," + namespace
-        + " ; keyword layerrule ignorealpha " + root.glassIgnoreAlpha + "," + namespace]
+    if (!config.glass) return ""
+    return "[[BATCH]]keyword layerrule blur," + namespace
+      + " ; keyword layerrule ignorealpha " + root.glassIgnoreAlpha + "," + namespace
   }
 
-  // Um pedido novo enquanto o `hyprctl` anterior ainda roda não pode ser
-  // perdido: dois cliques seguidos no interruptor deixariam o compositor
-  // parado no estado do primeiro. Ele fica marcado e sai quando o anterior
-  // termina — e como o comando é lido do ajuste de agora, o que sai é sempre o
-  // estado atual, não a fila de gestos.
+  // Um pedido novo enquanto o anterior ainda está no ar não pode ser perdido:
+  // dois cliques seguidos no interruptor deixariam o compositor parado no
+  // estado do primeiro. Ele fica marcado e sai quando o anterior termina — e
+  // como o comando é lido do ajuste de agora, o que sai é sempre o estado
+  // atual, não a fila de gestos.
   property bool glassPending: false
 
   function applyGlass() {
-    if (root.glassCommand.length === 0) return
-    if (glassProc.running) {
+    if (root.glassCommand === "") return
+    if (glassIpc.busy) {
       root.glassPending = true
       return
     }
     root.glassPending = false
-    glassProc.command = root.glassCommand
-    glassProc.running = true
+    glassIpc.send(root.glassCommand)
   }
 
   onGlassCommandChanged: root.applyGlass()
 
-  Process {
-    id: glassProc
-    running: false
-    onExited: if (root.glassPending) root.applyGlass()
+  ArcHyprland {
+    id: glassIpc
+    // O compositor responde `ok` a cada comando que aceitou; qualquer outra
+    // coisa é a explicação do que ele recusou, e vale mais no log do que
+    // perdida.
+    onReplied: function (reply) {
+      if (!/^(ok\s*)*$/.test(reply)) {
+        console.warn("arcdock: compositor refused the glass rule -", reply.trim())
+      }
+      if (root.glassPending) root.applyGlass()
+    }
+    onFailed: if (root.glassPending) root.applyGlass()
   }
 
   // O blur é do compositor, e ele pode estar desligado inteiro
@@ -550,21 +556,16 @@ Item {
   property bool compositorBlur: true
 
   function probeCompositorBlur() {
-    if (!blurProbe.running) blurProbe.running = true
+    blurProbe.send("j/getoption decoration:blur:enabled")
   }
 
-  Process {
+  ArcHyprland {
     id: blurProbe
-    command: ["hyprctl", "getoption", "decoration:blur:enabled", "-j"]
-    running: false
-    stdout: StdioCollector {
-      waitForEnd: true
-      onStreamFinished: {
-        try {
-          root.compositorBlur = !!JSON.parse(String(text)).bool
-        } catch (error) {
-          root.compositorBlur = true
-        }
+    onReplied: function (reply) {
+      try {
+        root.compositorBlur = !!JSON.parse(reply).bool
+      } catch (error) {
+        root.compositorBlur = true
       }
     }
   }
@@ -2035,7 +2036,8 @@ Item {
     // — e reler depois da própria gravação só reabriria a corrida de `stateLoaded`.
     watchChanges: false
     // O arquivo é curto e reescrito inteiro; sem isso um desligamento no meio da
-    // gravação deixaria os fixados pela metade.
+    // gravação deixaria os fixados pela metade. A gravação cria o diretório
+    // se ele ainda não existir (primeira execução) — não há `mkdir` a chamar.
     atomicWrites: true
     // Cala a leitura de um arquivo que ainda não existe — que é a primeira
     // execução, não um erro.
@@ -2055,16 +2057,7 @@ Item {
     }
   }
 
-  // A leitura não precisa do diretório, mas a primeira gravação precisa — e na
-  // primeira execução ele pode mesmo não existir.
-  Process {
-    id: stateDirProc
-    command: ["mkdir", "-p", root.stateDir]
-    running: false
-  }
-
   Component.onCompleted: {
-    stateDirProc.running = true
     root.rebuildSlots()
     stateFile.reload()
     // A escolha do monitor não é binding (ver `refreshDockMonitor`), então a

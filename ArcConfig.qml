@@ -308,7 +308,8 @@ Item {
     // reiniciar a shell — é assim que o resto do Omarchy se comporta.
     watchChanges: true
     // Curto e reescrito inteiro: sem isto um desligamento no meio da gravação
-    // deixaria os ajustes pela metade.
+    // deixaria os ajustes pela metade. A gravação cria o diretório se ele
+    // ainda não existir — não há `mkdir` a chamar antes dela.
     atomicWrites: true
     // Cala a leitura de um arquivo que ainda não existe — primeira execução,
     // não erro.
@@ -330,15 +331,5 @@ Item {
     }
   }
 
-  // A leitura não precisa do diretório, mas a primeira gravação precisa.
-  Process {
-    id: configDirProc
-    command: ["mkdir", "-p", config.configDir]
-    running: false
-  }
-
-  Component.onCompleted: {
-    configDirProc.running = true
-    configFile.reload()
-  }
+  Component.onCompleted: configFile.reload()
 }
