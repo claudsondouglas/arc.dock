@@ -175,6 +175,11 @@ The plugin lives in `~/.config/omarchy/plugins/io.github.claudsondouglas.arcdock
 `PanelWindow` geometry. `hyprctl layers | grep arc-dock` shows the dock window
 and its size. The code comments explain the design decisions.
 
+`docs/preview.sh` renders `preview.png`: it turns on `printMode` in
+`arc-dock.json` (the dock moves to the middle of the screen and stops hiding),
+switches the dock's monitor to an empty workspace, captures a band around the
+dock with `grim`, and restores the config and the workspace.
+
 ## License
 
 MIT.

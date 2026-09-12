@@ -106,7 +106,12 @@ Item {
     // que vêm arredondados, ele é o único de canto vivo. Os 20% são a medida
     // do MacTahoe: placa de 56 com raio 13 numa caixa de 64. Zero deixa o
     // quadrado. O que já vem do pacote não é tocado.
-    webAppIconRadius: 20
+    webAppIconRadius: 20,
+    // Modo de retrato: o dock vai para o meio da tela e não se esconde, para
+    // a captura mostrá-lo inteiro sobre o papel de parede desfocado. Não tem
+    // linha na janela de ajustes — é o `docs/preview.sh` que liga, captura e
+    // desliga.
+    printMode: false
   })
 
   // Faixa de cada medida. Vale para o que a janela de ajustes escreve *e* para
@@ -204,6 +209,7 @@ Item {
   readonly property bool showBadges: config.flag("showBadges")
   readonly property int recentCount: config.num("recentCount")
   readonly property int webAppIconRadius: config.num("webAppIconRadius")
+  readonly property bool printMode: config.flag("printMode")
 
   // Esta chave está no padrão do tema? É o que a janela de ajustes mostra para
   // dizer "isto ainda segue o tema" — e o que decide se o "Restaurar padrões"

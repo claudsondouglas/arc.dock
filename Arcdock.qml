@@ -438,6 +438,17 @@ Item {
   // dela, e daí para fora da tela, que a casca desliza ao esconder.
   readonly property int windowExtent: root.dockThickness + root.edgeMargin + root.magnifyHeadroom
 
+  // Modo de retrato (ver `printMode` no ArcConfig): a janela se afasta da
+  // borda até a casca ficar no meio da tela. A conta é sobre a *casca*, não
+  // sobre a janela: a folga da borda fica de um lado dela e a reserva da onda
+  // do outro, e centrar a janela deixaria a casca uns pixels fora do meio.
+  readonly property bool printMode: config.printMode
+  readonly property int printOffset: {
+    if (!root.printMode || !root.dockScreen) return 0
+    var screenExtent = root.vertical ? root.dockScreen.width : root.dockScreen.height
+    return Math.max(0, Math.round((screenExtent - root.dockThickness) / 2 - root.edgeMargin))
+  }
+
   // ----------------------------------------------------------------- saída
   //
   // O dock vive numa tela só. Sem um `screen` explícito a PanelWindow cai na
@@ -789,9 +800,10 @@ Item {
   //               dois apps lado a lado, em que nenhum está em tela cheia.
   //   always      estorva sempre; o dock só existe quando chamado.
   readonly property string autoHide: config.autoHide
-  readonly property bool intrusive: root.autoHide === "always"
+  // No retrato o dock não estorva nunca: a captura é dele.
+  readonly property bool intrusive: !root.printMode && (root.autoHide === "always"
     || (root.autoHide === "fullscreen" && root.screenFilled)
-    || (root.coveredMode && root.screenCovered)
+    || (root.coveredMode && root.screenCovered))
 
   // A *vontade* de ter o dock em tela, que é o que as condições sabem dizer.
   // Não é a mesma coisa que o dock estar de pé: aparecer é imediato, sumir
@@ -2238,10 +2250,10 @@ Item {
     }
 
     margins {
-      top: 0
-      bottom: 0
-      left: 0
-      right: 0
+      top: root.edge === "top" ? root.printOffset : 0
+      bottom: root.edge === "bottom" ? root.printOffset : 0
+      left: root.edge === "left" ? root.printOffset : 0
+      right: root.edge === "right" ? root.printOffset : 0
     }
 
     exclusionMode: ExclusionMode.Ignore
@@ -2340,10 +2352,10 @@ Item {
     // cada quadro pediria uma reconfiguração de layer a cada quadro; mover o
     // conteúdo dentro dela é uma translação e nada mais.
     margins {
-      top: 0
-      bottom: 0
-      left: 0
-      right: 0
+      top: root.edge === "top" ? root.printOffset : 0
+      bottom: root.edge === "bottom" ? root.printOffset : 0
+      left: root.edge === "left" ? root.printOffset : 0
+      right: root.edge === "right" ? root.printOffset : 0
     }
 
     // Flutua por cima: não reserva espaço nem empurra as janelas.
