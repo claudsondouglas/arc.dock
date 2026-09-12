@@ -976,6 +976,17 @@ Item {
     return { host: key.split("__")[0].replace(/_+$/, ""), key: key }
   }
 
+  // A parte do host que nomeia o site: "web.whatsapp.com" -> "whatsapp",
+  // "mail.google.com.br" -> "google". Sai o TLD (e o "com" de um "com.br"),
+  // e fica o rótulo de antes dele. Vazio se a chave não é de web app.
+  function webAppSite(key) {
+    var web = root.webAppFromId(key)
+    if (!web) return ""
+    var host = web.host.split(".")
+    while (host.length > 1 && host[host.length - 1].length <= 3) host.pop()
+    return host[host.length - 1] || ""
+  }
+
   // { host, key } da URL que a Exec= de um web app do Omarchy passa ao
   // omarchy-launch-webapp, na mesma forma do appId pra comparar por igualdade.
   function webAppFromExec(exec) {
@@ -1044,6 +1055,21 @@ Item {
     return entry && entry.icon ? String(entry.icon) : ""
   }
 
+  // Nome do ícone do slot. Para um web app o pacote de ícones vem antes da
+  // entrada .desktop: o que a entrada declara é o favicon que o
+  // omarchy-webapp-install baixou (ou um PNG do hicolor, como o
+  // "omarchy-discord"), e o pacote costuma ter o desenho do site no estilo
+  // dos outros ícones — pelo nome do site ("whatsapp", "youtube"). A busca é a
+  // temática do Qt, que falha quando o pacote não tem o nome (ver
+  // `launcherIconSource`); aí vale o da entrada, e sem entrada, a inicial.
+  // Para um app nativo a entrada continua mandando: é por ela que o pacote
+  // já sabe qual ícone é o dele.
+  function slotIconName(key, entry) {
+    var site = root.webAppSite(key)
+    if (site.length > 0 && String(Quickshell.iconPath(site, true)).length > 0) return site
+    return root.appIconName(entry)
+  }
+
   // Nome do ícone -> caminho do arquivo. Sem appLibrary (plugin carregado fora
   // da shell) sobra a busca temática do Qt, que resolve a maioria dos casos.
   function iconSource(name) {
@@ -1081,14 +1107,8 @@ Item {
   function appLabel(key) {
     // Um web app sem entrada .desktop ganha o nome do site: de
     // "brave-web.whatsapp.com__-default" a regra do ponto tiraria "Com".
-    // Sai o TLD (e o "com" de um "com.br") e fica a parte que nomeia o site.
-    var web = root.webAppFromId(key)
-    if (web) {
-      var host = web.host.split(".")
-      while (host.length > 1 && host[host.length - 1].length <= 3) host.pop()
-      var site = host[host.length - 1] || ""
-      if (site.length > 0) return site.charAt(0).toUpperCase() + site.slice(1)
-    }
+    var site = root.webAppSite(key)
+    if (site.length > 0) return site.charAt(0).toUpperCase() + site.slice(1)
     var parts = String(key || "").split(".")
     var last = parts[parts.length - 1] || key || ""
     if (last.length === 0) return ""
@@ -1105,7 +1125,7 @@ Item {
     return {
       key: key,
       name: (desktop && desktop.name) ? String(desktop.name) : appLabel(key),
-      icon: appIconName(desktop),
+      icon: slotIconName(key, desktop),
       desktop: desktop,
       windows: [],
       active: false,
