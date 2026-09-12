@@ -1062,12 +1062,34 @@ Item {
   // dos outros ícones — pelo nome do site ("whatsapp", "youtube"). A busca é a
   // temática do Qt, que falha quando o pacote não tem o nome (ver
   // `launcherIconSource`); aí vale o da entrada, e sem entrada, a inicial.
-  // Para um app nativo a entrada continua mandando: é por ela que o pacote
-  // já sabe qual ícone é o dele.
+  // Um PWA instalado pelo próprio browser ("Instalar app") não carrega o host
+  // no appId — é "brave-<id da extensão>-Default" — mas a entrada que o
+  // browser escreve tem o `Name=` do site ("GitHub"), e é por ele que o
+  // pacote é consultado. Só para essas entradas: para um app nativo a entrada
+  // continua mandando, porque é pelo `Icon=` dela que o pacote já sabe qual
+  // ícone é o dele, e "Files" pelo nome acharia qualquer coisa.
   function slotIconName(key, entry) {
+    var names = []
     var site = root.webAppSite(key)
-    if (site.length > 0 && String(Quickshell.iconPath(site, true)).length > 0) return site
+    if (site.length > 0) names.push(site)
+    if (root.isBrowserApp(entry)) {
+      var byName = String(entry.name || "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "")
+      // O site e o app de desktop dele dividem a marca ("github-desktop" é o
+      // Octocat), e é o segundo que os pacotes costumam ter.
+      if (byName.length > 0) names.push(byName, byName + "-desktop")
+    }
+    for (var i = 0; i < names.length; i++) {
+      if (String(Quickshell.iconPath(names[i], true)).length > 0) return names[i]
+    }
     return root.appIconName(entry)
+  }
+
+  // Entrada escrita por um browser Chromium ao instalar um PWA: a Exec= abre o
+  // browser com `--app-id=` e a classe de startup é a "crx_<id>" do Chromium.
+  function isBrowserApp(entry) {
+    if (!entry) return false
+    if (String(entry.startupClass || "").indexOf("crx_") === 0) return true
+    return String(entry.execString || "").indexOf("--app-id=") >= 0
   }
 
   // Nome do ícone -> caminho do arquivo. Sem appLibrary (plugin carregado fora
