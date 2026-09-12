@@ -112,6 +112,14 @@ Item {
   // de branco em cima a 20% embaixo em vez de ser um retângulo leitoso.
   readonly property color tintShade: root.tintForced ? "#16161a" : Color.popups.background
 
+  // A tinta do que se escreve sobre a casca (a inicial que faz as vezes de
+  // ícone). Não é a luz: a luz é branca nos dois tons de propósito, e branco
+  // sobre vidro claro é letra invisível. A tinta é o oposto do corpo — escura
+  // no claro, clara no escuro — e do tema quando o tom vem dele.
+  readonly property color tintInk: config.dockTheme === "dark" ? "#ffffff"
+    : config.dockTheme === "light" ? "#1c1c20"
+    : Color.popups.text
+
   // A tinta dos pontos de estado, como par [em foco, fora de foco].
   //
   // Com o tom vindo do tema, `accent` e `muted` são a resposta certa: o tema
@@ -1071,6 +1079,16 @@ Item {
 
   // Nome exibível derivado da chave: "org.kde.dolphin" -> "Dolphin".
   function appLabel(key) {
+    // Um web app sem entrada .desktop ganha o nome do site: de
+    // "brave-web.whatsapp.com__-default" a regra do ponto tiraria "Com".
+    // Sai o TLD (e o "com" de um "com.br") e fica a parte que nomeia o site.
+    var web = root.webAppFromId(key)
+    if (web) {
+      var host = web.host.split(".")
+      while (host.length > 1 && host[host.length - 1].length <= 3) host.pop()
+      var site = host[host.length - 1] || ""
+      if (site.length > 0) return site.charAt(0).toUpperCase() + site.slice(1)
+    }
     var parts = String(key || "").split(".")
     var last = parts[parts.length - 1] || key || ""
     if (last.length === 0) return ""
@@ -2421,7 +2439,7 @@ Item {
             indicatorStyle: config.indicatorStyle
             indicatorActive: root.indicatorInk[0]
             indicatorIdle: root.indicatorInk[1]
-            contentInk: root.tintSheen
+            contentInk: root.tintInk
             badgeCount: config.showBadges ? root.badgeCountFor(modelData) : 0
             // A onda: o dock mede a distância entre o ponteiro e o centro
             // desta célula na fileira, e devolve o quanto ela cresce e o quanto
@@ -2475,7 +2493,7 @@ Item {
             indicatorStyle: config.indicatorStyle
             indicatorActive: root.indicatorInk[0]
             indicatorIdle: root.indicatorInk[1]
-            contentInk: root.tintSheen
+            contentInk: root.tintInk
             badgeCount: config.showBadges ? root.badgeCountFor(modelData) : 0
             magnifyEnabled: config.magnify
             magnifyMax: root.magnifyMax
@@ -2497,7 +2515,7 @@ Item {
           visible: root.hasLauncher
           iconInset: root.iconPadding
           iconSource: root.launcherIconSource
-          contentInk: root.tintSheen
+          contentInk: root.tintInk
           width: root.launcherSize
           height: root.launcherSize
           // O botão é mais uma célula da fileira: a onda passa por ele como
