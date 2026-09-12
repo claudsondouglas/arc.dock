@@ -941,6 +941,39 @@ Item {
     return id.length > 0 ? id : "unknown"
   }
 
+  // Domínio embutido no appId de uma janela --app= do Chromium (e forks:
+  // Vivaldi, Brave, Edge...): "vivaldi-web.whatsapp.com__-Default" vira
+  // "web.whatsapp.com". Sem instalação de PWA por trás, esse appId não bate
+  // com nenhum id de entrada .desktop nem StartupWMClass, e o heuristicLookup
+  // do Quickshell não sabe procurar por ele.
+  function webAppDomain(id) {
+    // O caminho da URL vira parte do appId depois de "__" (barras trocadas por
+    // "_"), então a captura tem que ser gulosa até o sufixo de perfil final —
+    // um path com hífen (ex.: "kindle-library") quebraria uma captura preguiçosa
+    // ao parar no primeiro "-" que encontrasse.
+    var m = String(id || "").toLowerCase().match(
+      /^(?:google-chrome(?:-stable)?|chrome|chromium|brave|microsoft-edge|edge|opera|vivaldi|helium(?:-browser)?)-(.+)-(?:default|profile.*)$/
+    )
+    if (!m) return ""
+    return m[1].split("__")[0].replace(/_+$/, "")
+  }
+
+  // Entrada .desktop de um app --app=: os web apps do Omarchy (omarchy-launch-
+  // webapp/omarchy-webapp-install) são instalados sem StartupWMClass, então a
+  // única pista que sobrevive até aqui é a URL na Exec= batendo com o domínio
+  // do appId.
+  function webAppEntry(id) {
+    var domain = root.webAppDomain(id)
+    if (!domain || domain.length < 4) return null
+    var apps = (DesktopEntries.applications && DesktopEntries.applications.values) || []
+    for (var i = 0; i < apps.length; i++) {
+      var app = apps[i]
+      var exec = String((app && app.execString) || "").toLowerCase()
+      if (exec.indexOf("omarchy-launch-webapp") >= 0 && exec.indexOf(domain) >= 0) return app
+    }
+    return null
+  }
+
   // Entrada .desktop do app. O appId do toplevel é o que mais se aproxima do
   // id da entrada, e o heuristicLookup do Quickshell já cobre as variações
   // comuns (caixa, sufixos, StartupWMClass) que uma busca por id exato erra.
@@ -958,6 +991,8 @@ Item {
     } else if (id.length > 0) {
       var byAppId = DesktopEntries.heuristicLookup(id)
       if (byAppId) return byAppId
+      var byWebApp = root.webAppEntry(id)
+      if (byWebApp) return byWebApp
     }
     // Janelas sem appId caem na chave derivada do título; ainda vale tentar.
     if (String(key || "").indexOf("title:") !== 0) {
