@@ -941,37 +941,64 @@ Item {
     return id.length > 0 ? id : "unknown"
   }
 
-  // Domínio embutido no appId de uma janela --app= do Chromium (e forks:
-  // Vivaldi, Brave, Edge...): "vivaldi-web.whatsapp.com__-Default" vira
-  // "web.whatsapp.com". Sem instalação de PWA por trás, esse appId não bate
-  // com nenhum id de entrada .desktop nem StartupWMClass, e o heuristicLookup
-  // do Quickshell não sabe procurar por ele.
-  function webAppDomain(id) {
-    // O caminho da URL vira parte do appId depois de "__" (barras trocadas por
-    // "_"), então a captura tem que ser gulosa até o sufixo de perfil final —
-    // um path com hífen (ex.: "kindle-library") quebraria uma captura preguiçosa
-    // ao parar no primeiro "-" que encontrasse.
+  // Forma que o Chromium (e forks: Vivaldi, Brave, Edge...) grava no appId de
+  // uma janela --app=: host, "_" e o path com as barras trocadas por "_" —
+  // "https://read.amazon.com/kindle-library" vira
+  // "read.amazon.com__kindle-library". O "_" que sobra no fim é a barra final,
+  // que a URL da Exec= pode ter ou não; sai dos dois lados pra comparação bater.
+  function webAppKey(host, path) {
+    var h = String(host || "").toLowerCase().replace(/:\d+$/, "")
+    var p = String(path || "/").toLowerCase().replace(/\//g, "_")
+    return (h + "_" + p).replace(/_+$/, "")
+  }
+
+  // { host, key } embutidos no appId: "vivaldi-web.whatsapp.com__-Default" dá
+  // host "web.whatsapp.com" e chave "web.whatsapp.com". Sem instalação de PWA
+  // por trás, esse appId não bate com nenhum id de entrada .desktop nem
+  // StartupWMClass, e o heuristicLookup do Quickshell não sabe procurar por ele.
+  function webAppFromId(id) {
+    // O path fica depois do "__", então a captura tem que ser gulosa até o
+    // sufixo de perfil final — um path com hífen (ex.: "kindle-library")
+    // quebraria uma captura preguiçosa ao parar no primeiro "-" que encontrasse.
     var m = String(id || "").toLowerCase().match(
-      /^(?:google-chrome(?:-stable)?|chrome|chromium|brave|microsoft-edge|edge|opera|vivaldi|helium(?:-browser)?)-(.+)-(?:default|profile.*)$/
+      /^(?:google-chrome(?:-stable)?|chrome|chromium|brave|microsoft-edge|msedge|edge|opera|vivaldi|helium(?:-browser)?)-(.+)-(?:default|profile.*)$/
     )
-    if (!m) return ""
-    return m[1].split("__")[0].replace(/_+$/, "")
+    if (!m) return null
+    var key = m[1].replace(/_+$/, "")
+    return { host: key.split("__")[0].replace(/_+$/, ""), key: key }
+  }
+
+  // { host, key } da URL que a Exec= de um web app do Omarchy passa ao
+  // omarchy-launch-webapp, na mesma forma do appId pra comparar por igualdade.
+  function webAppFromExec(exec) {
+    var m = String(exec || "").match(/omarchy-launch-webapp\s+["']?(https?:\/\/[^\s"']+)/i)
+    if (!m) return null
+    var u = m[1].match(/^https?:\/\/([^\/?#]+)([^?#]*)/i)
+    if (!u) return null
+    var host = u[1].toLowerCase().replace(/:\d+$/, "")
+    return { host: host, key: root.webAppKey(host, u[2]) }
   }
 
   // Entrada .desktop de um app --app=: os web apps do Omarchy (omarchy-launch-
   // webapp/omarchy-webapp-install) são instalados sem StartupWMClass, então a
-  // única pista que sobrevive até aqui é a URL na Exec= batendo com o domínio
-  // do appId.
+  // única pista que sobrevive até aqui é a URL na Exec= batendo com o appId.
+  // A comparação é por igualdade, não por substring: "youtube.com" dentro de
+  // "music.youtube.com" mandaria o YouTube pro slot do YouTube Music. Host e
+  // path iguais ganham; só o host igual serve de reserva, pro caso de a janela
+  // ter sido aberta por outra URL do mesmo site.
   function webAppEntry(id) {
-    var domain = root.webAppDomain(id)
-    if (!domain || domain.length < 4) return null
+    var want = root.webAppFromId(id)
+    if (!want || want.host.length < 4) return null
     var apps = (DesktopEntries.applications && DesktopEntries.applications.values) || []
+    var byHost = null
     for (var i = 0; i < apps.length; i++) {
       var app = apps[i]
-      var exec = String((app && app.execString) || "").toLowerCase()
-      if (exec.indexOf("omarchy-launch-webapp") >= 0 && exec.indexOf(domain) >= 0) return app
+      var have = root.webAppFromExec(app && app.execString)
+      if (!have) continue
+      if (have.key === want.key) return app
+      if (!byHost && have.host === want.host) byHost = app
     }
-    return null
+    return byHost
   }
 
   // Entrada .desktop do app. O appId do toplevel é o que mais se aproxima do
