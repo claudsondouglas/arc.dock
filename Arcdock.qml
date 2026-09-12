@@ -1068,20 +1068,25 @@ Item {
   // pacote é consultado. Só para essas entradas: para um app nativo a entrada
   // continua mandando, porque é pelo `Icon=` dela que o pacote já sabe qual
   // ícone é o dele, e "Files" pelo nome acharia qualquer coisa.
-  function slotIconName(key, entry) {
+  //
+  // Devolve { name, rounded }: `rounded` é o web app que ficou com o ícone da
+  // própria entrada — o favicon quadrado — e por isso ganha o canto de
+  // `webAppIconRadius`. O que veio do pacote já tem o canto do pacote.
+  function slotIcon(key, entry) {
     var names = []
     var site = root.webAppSite(key)
     if (site.length > 0) names.push(site)
-    if (root.isBrowserApp(entry)) {
+    var browserApp = root.isBrowserApp(entry)
+    if (browserApp) {
       var byName = String(entry.name || "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "")
       // O site e o app de desktop dele dividem a marca ("github-desktop" é o
       // Octocat), e é o segundo que os pacotes costumam ter.
       if (byName.length > 0) names.push(byName, byName + "-desktop")
     }
     for (var i = 0; i < names.length; i++) {
-      if (String(Quickshell.iconPath(names[i], true)).length > 0) return names[i]
+      if (String(Quickshell.iconPath(names[i], true)).length > 0) return { name: names[i], rounded: false }
     }
-    return root.appIconName(entry)
+    return { name: root.appIconName(entry), rounded: site.length > 0 || browserApp }
   }
 
   // Entrada escrita por um browser Chromium ao instalar um PWA: a Exec= abre o
@@ -1144,10 +1149,12 @@ Item {
   // que saem as ações do menu de contexto (abrir de novo, e o que o próprio app
   // declara em `Actions`).
   function makeSlot(key, desktop) {
+    var icon = slotIcon(key, desktop)
     return {
       key: key,
       name: (desktop && desktop.name) ? String(desktop.name) : appLabel(key),
-      icon: slotIconName(key, desktop),
+      icon: icon.name,
+      iconRounded: icon.rounded,
       desktop: desktop,
       windows: [],
       active: false,
@@ -2471,6 +2478,9 @@ Item {
             // Resolvido aqui, e não dentro do modelo, para o binding depender
             // do índice de ícones da shell e se refazer quando ele mudar.
             iconSource: root.iconSource(modelData ? modelData.icon : "")
+            // Canto do favicon de web app, em px do ícone em repouso: a caixa do
+            // conteúdo escala junto com a onda, e o canto vai com ela.
+            iconRadius: (modelData && modelData.iconRounded) ? Math.round(root.iconSize * config.webAppIconRadius / 100) : 0
             iconInset: root.iconPadding
             width: root.slotSize
             height: root.slotSize
@@ -2527,6 +2537,7 @@ Item {
             app: modelData
             menuOpen: root.menuKey.length > 0 && !!modelData && root.menuKey === modelData.key
             iconSource: root.iconSource(modelData ? modelData.icon : "")
+            iconRadius: (modelData && modelData.iconRounded) ? Math.round(root.iconSize * config.webAppIconRadius / 100) : 0
             iconInset: root.iconPadding
             width: root.slotSize
             height: root.slotSize

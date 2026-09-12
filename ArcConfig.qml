@@ -99,7 +99,14 @@ Item {
     showBadges: true,
     // Quatro recentes: com ícone de 52 e slots colados, seis já empurravam o
     // dock para uma lista.
-    recentCount: 4
+    recentCount: 4,
+    // O canto do ícone de um web app, em *por cento do lado do ícone*. O ícone
+    // de web app é um favicon quadrado (o que o omarchy-webapp-install baixa,
+    // ou o PNG que o browser gera para um PWA), e ao lado dos ícones do pacote,
+    // que vêm arredondados, ele é o único de canto vivo. Os 20% são a medida
+    // do MacTahoe: placa de 56 com raio 13 numa caixa de 64. Zero deixa o
+    // quadrado. O que já vem do pacote não é tocado.
+    webAppIconRadius: 20
   })
 
   // Faixa de cada medida. Vale para o que a janela de ajustes escreve *e* para
@@ -124,7 +131,10 @@ Item {
     // Zero desliga o grupo dos recentes. O teto vale também para o histórico
     // guardado em disco (ver `recentHistoryLimit` no Arcdock): é ele que diz
     // quanta memória de apps fechados o dock chega a ter.
-    recentCount: [0, 12]
+    recentCount: [0, 12],
+    // Em 50 o canto vira meio lado e o quadrado, um círculo; acima disso o
+    // raio passaria do centro e o desenho já não seria um canto.
+    webAppIconRadius: [0, 50]
   })
 
   // O mesmo para as chaves de texto: um valor fora da lista cai no padrão, em
@@ -193,6 +203,7 @@ Item {
   readonly property bool showIndicators: config.flag("showIndicators")
   readonly property bool showBadges: config.flag("showBadges")
   readonly property int recentCount: config.num("recentCount")
+  readonly property int webAppIconRadius: config.num("webAppIconRadius")
 
   // Esta chave está no padrão do tema? É o que a janela de ajustes mostra para
   // dizer "isto ainda segue o tema" — e o que decide se o "Restaurar padrões"

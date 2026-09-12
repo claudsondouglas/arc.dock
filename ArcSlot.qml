@@ -32,6 +32,7 @@
 // na ordem gravada — continua sendo o dock. Qual eixo é "ao longo da fileira"
 // vem da borda em que o dock está ancorado.
 import QtQuick
+import Qt5Compat.GraphicalEffects
 import qs.Commons
 
 Item {
@@ -61,6 +62,11 @@ Item {
 
   // Caminho do ícone já resolvido pelo dock (file:// ou vazio).
   property string iconSource: ""
+
+  // Raio do canto recortado no ícone, em px da caixa em repouso. Zero desenha
+  // o arquivo como veio. Quem decide é o dock: só o favicon quadrado de um web
+  // app ganha canto, o que vem do pacote de ícones já tem o dele.
+  property int iconRadius: 0
 
   readonly property bool active: !!(app && app.active)
   readonly property string appName: (app && app.name) ? app.name : ""
@@ -367,6 +373,11 @@ Item {
     Image {
       id: icon
       anchors.fill: parent
+      // O favicon recortado também recua para a placa do pacote: no MacTahoe o
+      // desenho ocupa 56 de 64, com 4 de folga de cada lado, e um quadrado
+      // arredondado de canto igual mas sem a folga lia como o ícone maior da
+      // fileira. Sem canto o arquivo enche a caixa como qualquer outro ícone.
+      anchors.margins: slot.iconRadius > 0 ? Math.round(slot.iconExtent * 4 / 64) : 0
       // Ícone quadrado por convenção, mas os que não são não podem distorcer.
       fillMode: Image.PreserveAspectFit
       // Decodifica em pixels físicos: em HiDPI um decode no tamanho lógico
@@ -381,6 +392,25 @@ Item {
       // Só aparece quando de fato carregou — enquanto carrega ou se falhar, o
       // slot mostra a inicial em vez de um vazio.
       visible: status === Image.Ready
+
+      // O canto: a imagem vira camada e a máscara arredondada recorta. A
+      // textura da camada é do tamanho do decode (que já conta a ampliação e o
+      // DPR), e não da caixa em repouso — senão a onda ampliaria uma textura
+      // pequena e o favicon borraria justamente sob o ponteiro.
+      layer.enabled: slot.iconRadius > 0 && status === Image.Ready
+      layer.smooth: true
+      layer.textureSize: Qt.size(sourceSize.width, sourceSize.height)
+      layer.effect: OpacityMask { maskSource: iconMask }
+    }
+
+    // A máscara do canto. Fica invisível de propósito: só existe para ser
+    // renderizada na camada do ícone, e visível pintaria um retângulo branco
+    // por cima dele.
+    Rectangle {
+      id: iconMask
+      anchors.fill: icon
+      radius: slot.iconRadius
+      visible: false
     }
 
     // A inicial faz as vezes do ícone, e por morar na mesma caixa responde ao

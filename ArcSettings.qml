@@ -165,7 +165,9 @@ Item {
         { key: "showBadges", type: "bool", label: "Notification counter",
           description: "The red number on the corner of the icon, as on macOS: how many notifications arrived since the app was last focused." },
         { key: "recentCount", type: "int", label: "Recent apps",
-          description: "Apps you opened and closed stay within reach, between the ones with a slot and the button. Zero turns the group off." }
+          description: "Apps you opened and closed stay within reach, between the ones with a slot and the button. Zero turns the group off." },
+        { key: "webAppIconRadius", type: "int", label: "Web app icon corners", suffix: " %",
+          description: "Rounds the square favicon of a web app, as a share of its side. 20 matches the corners of the macOS-style icon packs; zero keeps it square. Icons that come from the pack are left as they are." }
       ]
     },
     {
