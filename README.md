@@ -132,7 +132,7 @@ the settings window. Changes apply as you make them; there is no apply button.
 | Size | icon size, gap between slots, inner padding, distance to the edge |
 | Magnification | on/off, peak size, reach |
 | Background | shell tone, frosted glass, opacity |
-| Content | app button, separator, state dots, notification counter, how many recents |
+| Content | app button and its icon (Omarchy logo or the theme's Launchpad), separator, state dots, notification counter, how many recents, web app icon corners |
 | Position | screen edge, monitor |
 | Hide | mode, grace before hiding, slide duration |
 

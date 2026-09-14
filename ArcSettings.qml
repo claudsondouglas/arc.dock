@@ -157,6 +157,7 @@ Item {
       items: [
         { key: "showLauncher", type: "bool", label: "App button",
           description: "The button that opens the app menu, at the end of the row." },
+        { key: "launcherIcon", type: "enum", label: "App button icon", needs: "showLauncher" },
         { key: "showSeparator", type: "bool", label: "Separator",
           description: "Divides the groups in the row: apps with a slot, recents and the app button." },
         { key: "showIndicators", type: "bool", label: "State dots",
@@ -217,6 +218,11 @@ Item {
     { value: "dark", label: "Dark" }
   ]
 
+  readonly property var launcherIconOptions: [
+    { value: "system", label: "System" },
+    { value: "theme", label: "Theme" }
+  ]
+
   readonly property var indicatorStyleOptions: [
     { value: "dot", label: "One dot" },
     { value: "dots", label: "Per window" },
@@ -256,6 +262,7 @@ Item {
 
   function optionsFor(spec) {
     if (spec.key === "dockTheme") return root.dockThemeOptions
+    if (spec.key === "launcherIcon") return root.launcherIconOptions
     if (spec.key === "indicatorStyle") return root.indicatorStyleOptions
     if (spec.key === "edge") return root.edgeOptions
     if (spec.key === "autoHide") return root.autoHideOptions
@@ -276,6 +283,10 @@ Item {
       if (root.config.dockTheme === "light") return "Light glass, regardless of the desktop theme."
       if (root.config.dockTheme === "dark") return "Dark glass, regardless of the desktop theme: the dock stays dark even on a light theme."
       return "The shell takes the active theme's popup tone and changes with it."
+    }
+    if (spec.key === "launcherIcon") {
+      if (root.config.launcherIcon === "theme") return "The Launchpad icon of the active icon theme: colorful and full on macOS-style packs."
+      return "The Omarchy logo, the same on every icon theme."
     }
     if (spec.key === "indicatorStyle") {
       if (root.config.indicatorStyle === "dots") return "Each open window gets a dot, up to two."

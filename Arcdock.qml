@@ -1118,29 +1118,52 @@ Item {
     return Quickshell.iconPath(value, true)
   }
 
-  // O ícone do botão de apps. A ordem vai do nome que os temas estilo macOS dão
-  // ao Launchpad até os genéricos de "todos os aplicativos", e o primeiro que o
-  // tema tiver vence; sem nenhum deles, o `ArcLauncher` desenha o glifo
-  // `nf-md-apps` de reserva.
+  // O ícone do botão de apps, por `config.launcherIcon`. Cada lista é tentada
+  // em ordem e o primeiro nome que o tema tiver vence; sem nenhum deles, o
+  // `ArcLauncher` desenha o glifo `nf-md-apps` de reserva.
   //
-  // Nos temas estilo macOS o desenho é colorido e cheio, e a ponta da fileira
-  // passa a ter um ícone com a mesma presença dos apps. É escolha assumida: é
-  // esse o ícone que o desktop espera nessa posição, e o botão fica sendo o
-  // Launchpad em vez de uma marca própria do dock.
-  readonly property var launcherIconNames: ["view-app-grid", "applications-all", "start-here"]
+  // "theme" é o Launchpad: vai do nome que os temas estilo macOS dão a ele até
+  // os genéricos de "todos os aplicativos". Nesses temas o desenho é colorido e
+  // cheio, e a ponta da fileira passa a ter um ícone com a mesma presença dos
+  // apps — é o ícone que esse desktop espera nessa posição.
+  //
+  // "system" (o padrão) é o logo do Omarchy, o `omarchy` do hicolor: a marca do
+  // sistema na ponta, igual em qualquer tema de ícones. Os nomes do Launchpad
+  // ficam atrás dele como reserva, porque fora do Omarchy o logo não existe e
+  // um ícone do tema ainda é melhor ponta de fileira que o glifo.
+  readonly property var themeLauncherIconNames: ["view-app-grid", "applications-all", "start-here"]
+  readonly property var launcherIconNames: config.launcherIcon === "theme"
+    ? root.themeLauncherIconNames
+    : ["omarchy"].concat(root.themeLauncherIconNames)
 
   // A busca aqui é a temática do Qt, e não a do `appLibrary` (ver `iconSource`
   // logo acima): a do `appLibrary` nunca falha — sem achar o nome ela devolve o
   // `application-x-executable` genérico —, e neste caminho falhar é informação.
   // É o que faz a busca passar para o próximo nome e, no fim, deixa o glifo
   // assumir em vez de plantar um ícone de executável na ponta da fileira.
-  readonly property string launcherIconSource: {
+  //
+  // Devolve { name, source }: o nome que casou interessa tanto quanto o caminho,
+  // porque é ele que diz se o que vai ser desenhado é o logo do sistema ou um
+  // ícone do tema (ver `launcherPlate`).
+  readonly property var launcherIcon: {
     for (var i = 0; i < root.launcherIconNames.length; i++) {
       var found = Quickshell.iconPath(root.launcherIconNames[i], true)
-      if (String(found).length > 0) return found
+      if (String(found).length > 0) return { name: root.launcherIconNames[i], source: found }
     }
-    return ""
+    return { name: "", source: "" }
   }
+  readonly property string launcherIconSource: root.launcherIcon.source
+
+  // O logo do Omarchy é um contorno solto, sem placa: ao lado dos ícones dos
+  // apps, que vêm em placa arredondada, ele lê como glifo e não como ícone. A
+  // placa que o `ArcLauncher` desenha atrás dele resolve isso, e é pintada com
+  // as cores do tema ativo (fundo e borda dos popups): o botão do sistema
+  // acompanha o tema do sistema, ao contrário do resto do dock, cujo tom é
+  // escolha do usuário (ver `dockTheme`). Um ícone do tema, mesmo em modo
+  // "system" por falta do logo, já vem com placa própria e não ganha outra.
+  // O canto é o mesmo dos web apps: é a única medida de canto de ícone que o
+  // dock tem, e as duas placas têm que ler como do mesmo pacote.
+  readonly property bool launcherPlate: root.launcherIcon.name === "omarchy"
 
   // Nome exibível derivado da chave: "org.kde.dolphin" -> "Dolphin".
   function appLabel(key) {
@@ -2581,6 +2604,10 @@ Item {
           iconInset: root.iconPadding
           iconSource: root.launcherIconSource
           contentInk: root.tintInk
+          plate: root.launcherPlate
+          plateColor: Color.popups.background
+          plateBorderColor: Color.popups.border
+          plateRadius: Math.round(root.iconSize * config.webAppIconRadius / 100)
           width: root.launcherSize
           height: root.launcherSize
           // O botão é mais uma célula da fileira: a onda passa por ele como

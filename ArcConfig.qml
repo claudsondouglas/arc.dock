@@ -84,6 +84,13 @@ Item {
     hideDelay: 500,
     slideDuration: 180,
     showLauncher: true,
+    // O desenho do botão de apps. "system" é o logo do Omarchy (o ícone
+    // `omarchy` do hicolor), a marca do sistema na ponta da fileira; "theme" é o
+    // Launchpad do tema de ícones, colorido e cheio nos temas estilo macOS, com
+    // a mesma presença dos apps. O padrão é o do sistema porque ele é o único
+    // que fica igual em qualquer tema — o do tema muda de desenho, ou some, a
+    // cada troca de pacote de ícones (ver `launcherIconNames` no Arcdock).
+    launcherIcon: "system",
     showSeparator: true,
     showIndicators: true,
     // Como um app aberto se marca. "dot" é um ponto só, tenha o app uma janela
@@ -148,6 +155,7 @@ Item {
     edge: ["bottom", "top", "left", "right"],
     autoHide: ["never", "fullscreen", "covered", "always"],
     dockTheme: ["theme", "light", "dark"],
+    launcherIcon: ["system", "theme"],
     indicatorStyle: ["dot", "dots", "bar"]
   })
 
@@ -204,6 +212,7 @@ Item {
   readonly property string dockTheme: config.str("dockTheme")
   readonly property string indicatorStyle: config.str("indicatorStyle")
   readonly property bool showLauncher: config.flag("showLauncher")
+  readonly property string launcherIcon: config.str("launcherIcon")
   readonly property bool showSeparator: config.flag("showSeparator")
   readonly property bool showIndicators: config.flag("showIndicators")
   readonly property bool showBadges: config.flag("showBadges")

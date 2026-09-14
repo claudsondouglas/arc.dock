@@ -31,6 +31,26 @@ Item {
   // Caminho do ícone já resolvido pelo dock (vazio quando o tema não tem).
   property string iconSource: ""
 
+  // A placa atrás do ícone: um quadrado arredondado com fundo e borda, na
+  // mesma caixa em que o pacote de ícones desenha a placa dos apps. É para o
+  // logo do sistema, que é um contorno solto e sem ela lê como glifo ao lado
+  // dos ícones dos apps; um ícone do tema já vem com a própria placa e não a
+  // liga. As cores são de quem monta — o dock as puxa do tema ativo.
+  property bool plate: false
+  property color plateColor: Color.popups.background
+  property color plateBorderColor: Color.popups.border
+  property int plateRadius: 0
+
+  // A placa recua da caixa do ícone o mesmo que a do MacTahoe: 4 de 64 por
+  // lado. É o recuo que o `ArcSlot` dá ao favicon recortado, e é o que faz as
+  // duas placas terem o mesmo tamanho na mesma fileira.
+  readonly property int plateInset: Math.round(launcher.iconExtent * 4 / 64)
+
+  // Dentro da placa o desenho ocupa ~62% do lado, que é quanto o símbolo ocupa
+  // da placa nos ícones estilo macOS. O PNG do logo quase não traz folga
+  // própria (260 de 300), então sem este recuo ele encostaria na borda.
+  readonly property int plateGlyphInset: Math.round((launcher.iconExtent - launcher.plateInset * 2) * 0.19)
+
   // A tinta do glifo que substitui um ícone que não resolveu. Padrão do tema,
   // sobrescrita por quem monta quando o tom da casca foi fixado (ver
   // `contentInk` no ArcSlot, que existe pela mesma razão).
@@ -124,21 +144,15 @@ Item {
     y: launcher.vertical ? launcher.magnifyShift : 0
   }
 
-  // Mesmo tratamento do ícone do slot: encaixe sem distorcer e decode em
-  // pixels físicos, para não borrar em HiDPI.
-  Image {
-    id: icon
+  // A caixa do ícone. Placa e desenho moram nela e crescem juntos sob o
+  // ponteiro — uma placa que ficasse parada enquanto o logo cresce leria como
+  // dois objetos.
+  Item {
+    id: content
     anchors.centerIn: parent
     width: launcher.iconExtent
     height: launcher.iconExtent
-    fillMode: Image.PreserveAspectFit
-    // O fator do hover entra na conta: é o maior tamanho que o ícone chega a
-    // ocupar, e decodificar já nele evita borrar quando o ponteiro o amplia.
-    sourceSize.width: Math.round(width * launcher.contentScaleMax * Screen.devicePixelRatio)
-    sourceSize.height: Math.round(height * launcher.contentScaleMax * Screen.devicePixelRatio)
-    source: launcher.iconSource
-    asynchronous: true
-    visible: status === Image.Ready
+    visible: icon.status === Image.Ready
     transformOrigin: launcher.contentOrigin
     scale: launcher.contentScale
     // A curva é mantida pelo `onHotChanged` e a duração pelo dock; os valores
@@ -146,13 +160,39 @@ Item {
     Behavior on scale {
       NumberAnimation { id: iconScale; duration: launcher.magnifyDuration; easing.type: launcher.hotEasing }
     }
+
+    Rectangle {
+      anchors.fill: parent
+      anchors.margins: launcher.plateInset
+      visible: launcher.plate
+      radius: launcher.plateRadius
+      color: launcher.plateColor
+      border.width: 1
+      border.color: launcher.plateBorderColor
+      antialiasing: true
+    }
+
+    // Mesmo tratamento do ícone do slot: encaixe sem distorcer e decode em
+    // pixels físicos, para não borrar em HiDPI.
+    Image {
+      id: icon
+      anchors.fill: parent
+      anchors.margins: launcher.plate ? launcher.plateInset + launcher.plateGlyphInset : 0
+      fillMode: Image.PreserveAspectFit
+      // O fator do hover entra na conta: é o maior tamanho que o ícone chega a
+      // ocupar, e decodificar já nele evita borrar quando o ponteiro o amplia.
+      sourceSize.width: Math.round(width * launcher.contentScaleMax * Screen.devicePixelRatio)
+      sourceSize.height: Math.round(height * launcher.contentScaleMax * Screen.devicePixelRatio)
+      source: launcher.iconSource
+      asynchronous: true
+    }
   }
 
   // OpticalGlyph em vez de Text: os glifos de ícone dos Nerd Fonts não vêm
   // centrados na própria caixa, e ele corrige essa deriva horizontal.
   OpticalGlyph {
     anchors.fill: parent
-    visible: !icon.visible
+    visible: !content.visible
     text: launcher.glyph
     // A família vem do alias (`Style.fontFamily`), não da resolvida, para o
     // botão acompanhar um `omarchy font set` sem reiniciar a shell.
@@ -160,7 +200,7 @@ Item {
     // Num Nerd Font a mancha do glifo ocupa ~0.63 do `pixelSize`; o resto é a
     // caixa de linha em volta. Dividir por essa fração converte "altura
     // pintada que eu quero" em `pixelSize`, e a mira é 80% da caixa do ícone.
-    fontSize: Math.max(1, Math.round(icon.height * 0.8 / 0.63))
+    fontSize: Math.max(1, Math.round(content.height * 0.8 / 0.63))
     color: launcher.contentInk
     // O glifo faz as vezes do ícone, então responde ao ponteiro igual a ele.
     transformOrigin: launcher.contentOrigin
