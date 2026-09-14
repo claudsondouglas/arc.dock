@@ -1118,16 +1118,10 @@ Item {
     return Quickshell.iconPath(value, true)
   }
 
-  // O ícone do botão de apps. A ordem vai do nome que os temas estilo macOS dão
-  // ao Launchpad até os genéricos de "todos os aplicativos", e o primeiro que o
-  // tema tiver vence; sem nenhum deles, o `ArcLauncher` desenha o glifo
-  // `nf-md-apps` de reserva.
-  //
-  // Nos temas estilo macOS o desenho é colorido e cheio, e a ponta da fileira
-  // passa a ter um ícone com a mesma presença dos apps. É escolha assumida: é
-  // esse o ícone que o desktop espera nessa posição, e o botão fica sendo o
-  // Launchpad em vez de uma marca própria do dock.
-  readonly property var launcherIconNames: ["view-app-grid", "applications-all", "start-here"]
+  // O ícone do botão de apps. Agora é sempre o ícone do Omarchy (`omarchy`
+  // em `hicolor`), e não o Launchpad genérico; sem ele, o `ArcLauncher`
+  // desenha o glifo `nf-md-apps` de reserva.
+  readonly property var launcherIconNames: ["omarchy"]
 
   // A busca aqui é a temática do Qt, e não a do `appLibrary` (ver `iconSource`
   // logo acima): a do `appLibrary` nunca falha — sem achar o nome ela devolve o
