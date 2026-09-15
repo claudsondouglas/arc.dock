@@ -949,6 +949,17 @@ Item {
     return root.opaqueAppIds.indexOf(String(id || "").trim().toLowerCase()) !== -1
   }
 
+  // AppIds que nunca ganham slot: serviços de portal sem janela própria.
+  // `xdg-desktop-portal-gtk` é o caso visto: executa /usr/lib/xdg-desktop-portal-gtk
+  // (NoDisplay) e aparece como appId de diálogos de file-picker, mas não é app lançável.
+  readonly property var ignoredAppIds: [
+    "xdg-desktop-portal-gtk", "xdg-desktop-portal", "xdg-desktop-portal-hyprland"
+  ]
+
+  function isIgnoredAppId(id) {
+    return root.ignoredAppIds.indexOf(String(id || "").trim().toLowerCase()) !== -1
+  }
+
   // Chave de agrupamento. O appId do wlr-toplevel já é o identificador
   // canônico do app; o título entra quando o cliente não manda appId (raro, mas
   // acontece com janelas nativas do XWayland) ou quando o appId é opaco.
@@ -1219,6 +1230,7 @@ Item {
       var top = live[i]
       if (!top) continue
       var key = appKey(top)
+      if (root.isIgnoredAppId(key)) continue
       var entry = byKey[key]
       if (!entry) {
         entry = makeSlot(key, appEntry(top, key))
@@ -1263,6 +1275,7 @@ Item {
     var recents = []
     for (var r = 0; r < root.recent.length && recents.length < root.recentCount; r++) {
       var recentKey = root.recent[r].key
+      if (root.isIgnoredAppId(recentKey)) continue
       if (byKey[recentKey]) continue
       var recentDesktop = root.itemDesktop(root.recent[r])
       if (!recentDesktop) continue
@@ -1325,6 +1338,7 @@ Item {
   // o item quando há entrada.
   function togglePin(entry) {
     if (!entry) return
+    if (root.isIgnoredAppId(entry.key)) return
     var next = root.pinned.slice()
     var at = root.pinIndex(entry.key)
     if (at >= 0) next.splice(at, 1)
@@ -1363,6 +1377,7 @@ Item {
   property var recentSlots: []
 
   readonly property int recentCount: config.recentCount
+  onRecentCountChanged: root.rebuildSlots()
 
   // O histórico guardado vai até o teto do ajuste, e não até o valor de hoje:
   // baixar "apps recentes" para 2 e voltar para 6 não pode ter jogado fora, no
@@ -1429,6 +1444,7 @@ Item {
     var next = root.recent
     for (var j = 0; j < opened.length; j++) {
       var key = opened[j]
+      if (root.isIgnoredAppId(key)) continue
       var entry = byKey[key]
       if (!entry || !entry.desktop || root.pinIndex(key) >= 0) continue
       var without = []
@@ -2149,6 +2165,7 @@ Item {
       var item = items[i] || {}
       var key = String(item.key || "").trim().toLowerCase()
       if (key.length === 0 || seen[key]) continue
+      if (root.isIgnoredAppId(key)) continue
       seen[key] = true
       out.push({ key: key, entry: String(item.entry || "") })
     }
