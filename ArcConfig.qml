@@ -57,6 +57,9 @@ Item {
     magnify: true,
     magnifyScale: 125,
     magnifyReach: 2,
+    // Limite retangular 18px além do ícone quando o dock ativo em área livre.
+    // Geometria cresce com easing antes do ícone escalar, convivendo com onda.
+    halo: true,
     // O vidro: fundo translúcido sobre o blur do Hyprland, em vez do tom cheio
     // do tema. A opacidade é *inteira, em por cento*, e não uma fração de 0 a
     // 1: assim ela passa pela mesma faixa e pelo mesmo saneamento das outras
@@ -202,6 +205,7 @@ Item {
   readonly property bool magnify: config.flag("magnify")
   readonly property int magnifyScale: config.num("magnifyScale")
   readonly property int magnifyReach: config.num("magnifyReach")
+  readonly property bool halo: config.flag("halo")
   readonly property bool glass: config.flag("glass")
   readonly property int glassOpacity: config.num("glassOpacity")
   readonly property int hideDelay: config.num("hideDelay")

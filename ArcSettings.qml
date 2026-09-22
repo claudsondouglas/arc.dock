@@ -133,7 +133,9 @@ Item {
         { key: "magnifyScale", type: "int", label: "Size at the peak", suffix: " %", needs: "magnify",
           description: "How much the peak icon grows relative to its resting size." },
         { key: "magnifyReach", type: "int", label: "Reach", suffix: " slots", suffixOne: " slot", needs: "magnify",
-          description: "How many neighbors on each side rise along with the peak icon." }
+          description: "How many neighbors on each side rise along with the peak icon." },
+        { key: "halo", type: "bool", label: "Gradual boundary",
+          description: "A rectangular 20 px invisible boundary around each icon when the dock is active. Extends hit-area and eases in gradually so the pop feels soft, while the wave keeps its original scale." }
       ]
     },
     {

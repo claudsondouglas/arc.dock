@@ -296,6 +296,13 @@ Item {
     NumberAnimation { duration: slot.magnifyDuration; easing.type: slot.hotEasing }
   }
 
+  // ------------------------------------------------------ contorno gradual
+  // Limite retangular 20px além do ícone quando o dock está ativo em área livre.
+  // Geometria cresce com easing antes do ícone escalar, convivendo com onda.
+  property bool haloActive: false
+  property int haloExtension: 20
+  property int haloDuration: 470
+
   // ------------------------------------------------------------- arrastar
   //
   // Só os fixados se reordenam: os demais são ordenados pela ordem em que os
@@ -546,8 +553,12 @@ Item {
 
   MouseArea {
     id: pointer
-    anchors.fill: parent
+    anchors.centerIn: parent
+    width: parent.width + (slot.haloActive ? slot.haloExtension * 2 : 0)
+    height: parent.height + (slot.haloActive ? slot.haloExtension * 2 : 0)
     hoverEnabled: true
+    Behavior on width { NumberAnimation { duration: slot.haloDuration; easing.type: Easing.OutCubic } }
+    Behavior on height { NumberAnimation { duration: slot.haloDuration; easing.type: Easing.OutCubic } }
     // Slot sem app é espaço morto: nada a ativar, nada a sinalizar no cursor.
     // Com o slot na mão o cursor fecha, que é o que diz "isto está pego".
     cursorShape: slot.dragging

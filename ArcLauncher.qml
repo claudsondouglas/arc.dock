@@ -137,6 +137,10 @@ Item {
     NumberAnimation { duration: launcher.magnifyDuration; easing.type: launcher.hotEasing }
   }
 
+  property bool haloActive: false
+  property int haloExtension: 20
+  property int haloDuration: 470
+
   // Como no slot: a Grid do dock é quem posiciona o botão, então quem o desloca
   // é uma transform — escrever em `x`/`y` brigaria com o layout.
   transform: Translate {
@@ -212,8 +216,12 @@ Item {
 
   MouseArea {
     id: pointer
-    anchors.fill: parent
+    anchors.centerIn: parent
+    width: parent.width + (launcher.haloActive ? launcher.haloExtension * 2 : 0)
+    height: parent.height + (launcher.haloActive ? launcher.haloExtension * 2 : 0)
     hoverEnabled: true
+    Behavior on width { NumberAnimation { duration: launcher.haloDuration; easing.type: Easing.OutCubic } }
+    Behavior on height { NumberAnimation { duration: launcher.haloDuration; easing.type: Easing.OutCubic } }
     cursorShape: Qt.PointingHandCursor
     acceptedButtons: Qt.LeftButton | Qt.RightButton
     onClicked: function (mouse) {

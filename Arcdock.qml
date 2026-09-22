@@ -336,13 +336,21 @@ Item {
 
   onMagnifyOnChanged: root.magnifyDuration = root.magnifyOn ? 0 : root.rowTransition
 
+  // 20px invisible rectangular boundary when dock active. Hit-area eases.
+  readonly property bool haloEnabled: config.halo
+  readonly property int haloExtension: 20
+  readonly property bool haloOn: root.haloEnabled && root.dockShown
+  readonly property int haloDuration: 570
+
   // Onde o ponteiro está, medido no sistema em que a Grid posiciona as células
   // — o começo da fileira é o zero. A área sensível ao ponteiro começa junto
   // com a casca em repouso (ver `inputArea`), então descontar a folga da casca
-  // já converte de uma para a outra.
+  // já converte de uma para a outra. Halo expande inputArea em 20px, então
+  // desconta haloExtension quando ativo para vertical/horizontal não ficar
+  // deslocado e causar jerk no eixo vertical.
   readonly property real magnifyPointer: (root.vertical
     ? pointerWatch.point.position.y
-    : pointerWatch.point.position.x) - root.dockPadding
+    : pointerWatch.point.position.x) - root.dockPadding - (root.haloOn ? root.haloExtension : 0)
 
   // O peso da onda a uma distância `d` do ponteiro: 1 debaixo dele, 0 na ponta
   // do alcance. Cosseno levantado, e não uma reta: ele chega aos dois extremos
@@ -510,17 +518,15 @@ Item {
   // Sem `blur_popups`: o menu de contexto é uma popup desta mesma janela, mas
   // é opaco de propósito (ver `surfaceColor` no ArcMenu), e desfocar o que
   // passa atrás de uma superfície sólida é trabalho que não aparece.
+  // Frost invisible: never enable blur
   readonly property string glassCommand: {
-    // Ancorado nas duas pontas: o compositor casa a expressão inteira, então
-    // sem elas a regra pegaria também a janela de ajustes (`arc-dock-settings`)
-    // — que é um cartão de texto, e o texto não se lê sobre um borrão.
     var namespace = "^(" + root.layerNamespace + ")$"
     if (Hyprland.usingLua) {
       return 'eval hl.layer_rule({ name = "' + root.glassRuleName + '"'
         + ', match = { namespace = "' + namespace + '" }'
         + ', blur = true'
         + ', ignore_alpha = ' + root.glassIgnoreAlpha
-        + ', enabled = ' + (config.glass ? "true" : "false") + ' })'
+        + ', enabled = false })'
     }
     // Config legada (`.conf`): as regras não têm nome, então não há como
     // desfazer uma — só um `hyprctl reload`, que é caro demais para um
@@ -2453,6 +2459,7 @@ Item {
         // Dentro da casca, e não ao lado dela como a fileira: o brilho é a
         // superfície pegando luz, então ele acompanha o comprimento dela. A
         // fileira vem depois, e por isso os ícones ficam por cima do brilho.
+        // Frost invisible: keeps shell solid, no glass highlight/blur
         ArcGlass {
           anchors.fill: parent
           anchors.topMargin: shellSurface.borderTop
@@ -2460,10 +2467,7 @@ Item {
           anchors.bottomMargin: shellSurface.borderBottom
           anchors.leftMargin: shellSurface.borderLeft
           radius: Math.max(0, root.dockRadius - shellSurface.borderTop)
-          visible: config.glass
-          // Sem isto o brilho continuaria saindo do tema enquanto a casca já
-          // saiu dele, e a luz de um tema claro apagaria a casca escura por
-          // dentro — exatamente onde ela devia estar mais viva.
+          visible: false
           tint: root.tintSheen
           shade: root.tintShade
         }
@@ -2553,6 +2557,9 @@ Item {
             magnifyDuration: root.magnifyDuration
             magnifyScale: root.magnifyScaleAt(rowCenter)
             magnifyShift: root.magnifyShiftAt(rowCenter)
+            haloActive: root.haloOn
+            haloExtension: root.haloExtension
+            haloDuration: root.haloDuration
             // Só os fixados se reordenam (ver a seção de arrasto no topo).
             draggable: !!modelData && modelData.pinned
             dragThreshold: root.dragThreshold
@@ -2605,6 +2612,9 @@ Item {
             magnifyDuration: root.magnifyDuration
             magnifyScale: root.magnifyScaleAt(rowCenter)
             magnifyShift: root.magnifyShiftAt(rowCenter)
+            haloActive: root.haloOn
+            haloExtension: root.haloExtension
+            haloDuration: root.haloDuration
             draggable: false
             onActivated: {
               root.closeMenu()
@@ -2635,6 +2645,9 @@ Item {
           magnifyDuration: root.magnifyDuration
           magnifyScale: root.magnifyScaleAt(rowCenter)
           magnifyShift: root.magnifyShiftAt(rowCenter)
+          haloActive: root.haloOn
+          haloExtension: root.haloExtension
+          haloDuration: root.haloDuration
           onActivated: root.openAppMenu()
           // O botão direito no botão de apps abre os ajustes do dock. É o
           // único canto do dock que não pertence a app nenhum, então é onde
@@ -2667,10 +2680,15 @@ Item {
     // essa conta é só descontar a folga da casca.
     Item {
       id: inputArea
-      x: root.vertical ? root.inputOffset : root.inputStart
-      y: root.vertical ? root.inputStart : root.inputOffset
-      width: root.vertical ? root.inputExtent : root.dockLength
-      height: root.vertical ? root.dockLength : root.inputExtent
+      // Halo 20px (≈13px beyond shell) expands hit-area. Gradual because halo
+      // eases 320ms. For vertical/horizontal, across-axis expands only towards
+      // center (one side) to avoid off-screen flicker that caused vertical jerk;
+      // along-axis expands both ends.
+      readonly property int haloExtra: root.haloOn ? root.haloExtension : 0
+      x: root.vertical ? (root.leadingEdge ? root.inputOffset : root.inputOffset - haloExtra) : root.inputStart - haloExtra
+      y: root.vertical ? root.inputStart - haloExtra : (root.leadingEdge ? root.inputOffset : root.inputOffset - haloExtra)
+      width: root.vertical ? root.inputExtent + haloExtra : root.dockLength + haloExtra * 2
+      height: root.vertical ? root.dockLength + haloExtra * 2 : root.inputExtent + haloExtra
 
       HoverHandler {
         id: pointerWatch
