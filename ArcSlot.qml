@@ -397,7 +397,16 @@ Item {
       // textura da camada é do tamanho do decode (que já conta a ampliação e o
       // DPR), e não da caixa em repouso — senão a onda ampliaria uma textura
       // pequena e o favicon borraria justamente sob o ponteiro.
-      layer.enabled: slot.iconRadius > 0 && status === Image.Ready
+      //
+      // A camada não pode depender de `status`. Numa troca de escala o Qt
+      // percorre a árvore de itens (`QQuickWindow::physicalDpiChanged`) e o
+      // ícone recarrega no meio da varredura: o `status` sai de `Ready`, e
+      // desligar a camada ali apaga o ShaderEffectSource e a OpacityMask na
+      // hora, enquanto o Qt ainda vai visitar esses dois irmãos — um
+      // use-after-free que derruba a shell inteira. Enquanto o ícone não
+      // carrega, o efeito some junto com a imagem, porque a camada segue a
+      // visibilidade dela; na tela nada muda.
+      layer.enabled: slot.iconRadius > 0
       layer.smooth: true
       layer.textureSize: Qt.size(sourceSize.width, sourceSize.height)
       layer.effect: OpacityMask { maskSource: iconMask }
